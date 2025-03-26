@@ -31,6 +31,7 @@ SOFTWARE.
 #include <mach-o/getsect.h>
 #include <string.h>
 #include <sys/time.h>
+#include "CydiaSubstrate.framework/Headers/CydiaSubstrate.h"
 
 static float timeScale_speed = 1.0;
 
@@ -264,10 +265,10 @@ int hook_clock_gettime(void) {
     return 0;
   }
 
-  return rebind_symbols(
-      (struct rebinding[1]){
-          {"clock_gettime", my_clock_gettime, (void *)&real_clock_gettime}},
-      1);
+  MSHookFunction(MSFindSymbol(NULL, "_clock_gettime"), my_clock_gettime, (void *)&real_clock_gettime);
+
+  // return rebind_symbols((struct rebinding[1]){{"clock_gettime", my_clock_gettime, (void *)&real_clock_gettime}},1);
+  return 0;
 }
 
 void reset_clock_gettime(void) { clock_gettime_speed = 1.0; }
